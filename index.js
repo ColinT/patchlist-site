@@ -80,7 +80,7 @@ function setHackDatesFilterHandler(hackDatesInput, tableRowContents) {
  * @param {SearchKey} keyName
  * @param {HackTableRowContent[]} tableRowContents
  */
- function filterRows(searchString, keyName, tableRowContents) {
+function filterRows(searchString, keyName, tableRowContents) {
   if (searchString === "") {
     tableRowContents.forEach((tableRowContent) => showTableRow(tableRowContent.tableRow));
   } else {
@@ -91,7 +91,7 @@ function setHackDatesFilterHandler(hackDatesInput, tableRowContents) {
       } else {
         hideTableRow(tableRow);
       }
-    })
+    });
   }
 }
 
