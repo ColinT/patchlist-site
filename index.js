@@ -20,6 +20,10 @@ const TAG_COLUMN_INDEX = 3;
  * @typedef {"hackName" | "authorName" | "hackDate" | "tag"} SearchKey
  */
 
+/**
+ * @typedef {(tableRowContent: HackTableRowContent) => boolean} FilterPredicate
+ */
+
 function main() {
   const myTable = document.getElementById("myTable");
 
@@ -55,7 +59,7 @@ function main() {
 function setHackNamesFilterHandler(hackNamesInput, tableRowContents) {
   hackNamesInput.addEventListener("keyup", debounce((keyUpEvent) => {
     const searchString = keyUpEvent.target.value.toUpperCase();
-    filterRows(searchString, "hackName", tableRowContents);
+    filterRows(tableRowContents, isTableRowContentKeySubstring(searchString, "hackName"));
   }), DEBOUNCE_DELAY);
 }
 
@@ -66,7 +70,7 @@ function setHackNamesFilterHandler(hackNamesInput, tableRowContents) {
 function setAuthorNamesFilterHandler(authorNamesInput, tableRowContents) {
   authorNamesInput.addEventListener("keyup", debounce((keyUpEvent) => {
     const searchString = keyUpEvent.target.value.toUpperCase();
-    filterRows(searchString, "authorName", tableRowContents);
+    filterRows(tableRowContents, isTableRowContentKeySubstring(searchString, "authorName"));
   }), DEBOUNCE_DELAY);
 }
 
@@ -77,7 +81,7 @@ function setAuthorNamesFilterHandler(authorNamesInput, tableRowContents) {
 function setHackDatesFilterHandler(hackDatesInput, tableRowContents) {
   hackDatesInput.addEventListener("keyup", debounce((keyUpEvent) => {
     const searchString = keyUpEvent.target.value.toUpperCase();
-    filterRows(searchString, "hackDate", tableRowContents);
+    filterRows(tableRowContents, isTableRowContentKeySubstring(searchString, "hackDate"));
   }), DEBOUNCE_DELAY);
 }
 
@@ -88,27 +92,50 @@ function setHackDatesFilterHandler(hackDatesInput, tableRowContents) {
  function setTagFilterHandler(tagInput, tableRowContents) {
   tagInput.addEventListener("change", debounce((changeEvent) => {
     const searchString = changeEvent.target.value.toUpperCase();
-    filterRows(searchString, "tag", tableRowContents);
+    filterRows(tableRowContents, isTableRowContentKeyEqual(searchString, "tag"));
   }), DEBOUNCE_DELAY);
+}
+
+/**
+ * @param {HackTableRowContent[]} tableRowContents
+ * @param {FilterPredicate} predicate
+ */
+function filterRows(tableRowContents, predicate) {
+  tableRowContents.forEach((tableRowContent) => {
+    const tableRow = tableRowContent.tableRow;
+    if (predicate(tableRowContent)) {
+      showTableRow(tableRow);
+    } else {
+      hideTableRow(tableRow);
+    }
+  });
 }
 
 /**
  * @param {string} searchString
  * @param {SearchKey} keyName
- * @param {HackTableRowContent[]} tableRowContents
+ * @return {FilterPredicate}
  */
-function filterRows(searchString, keyName, tableRowContents) {
-  if (searchString === "") {
-    tableRowContents.forEach((tableRowContent) => showTableRow(tableRowContent.tableRow));
-  } else {
-    tableRowContents.forEach((tableRowContent) => {
-      const tableRow = tableRowContent.tableRow;
-      if (tableRowContent[keyName].includes(searchString)) {
-        showTableRow(tableRow);
-      } else {
-        hideTableRow(tableRow);
-      }
-    });
+function isTableRowContentKeySubstring(searchString, keyName) {
+  return (tableRowContent) => {
+    if (searchString === "") {
+      return true;
+    }
+    return tableRowContent[keyName].includes(searchString);
+  }
+}
+
+/**
+ * @param {string} searchString
+ * @param {SearchKey} keyName
+ * @return {FilterPredicate}
+ */
+function isTableRowContentKeyEqual(searchString, keyName) {
+  return (tableRowContent) => {
+    if (searchString === "") {
+      return true;
+    }
+    return tableRowContent[keyName] === searchString;
   }
 }
 
