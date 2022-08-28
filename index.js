@@ -5,17 +5,19 @@ const DEBOUNCE_DELAY = 200;
 const HACK_NAME_COLUMN_INDEX = 0;
 const AUTHOR_NAME_COLUMN_INDEX = 1;
 const HACK_DATE_COLUMN_INDEX = 2;
+const TAG_COLUMN_INDEX = 3;
 
 /**
  * @typedef {Object} HackTableRowContent
  * @property {string} hackName
  * @property {string} authorName
  * @property {string} hackDate
+ * @property {string} tag
  * @property {HTMLTableRowElement} tableRow
  */
 
 /**
- * @typedef {"hackName" | "authorName" | "hackDate"} SearchKey
+ * @typedef {"hackName" | "authorName" | "hackDate" | "tag"} SearchKey
  */
 
 function main() {
@@ -28,6 +30,7 @@ function main() {
       hackName: columns[HACK_NAME_COLUMN_INDEX].innerText.toUpperCase(),
       authorName: columns[AUTHOR_NAME_COLUMN_INDEX].innerText.toUpperCase(),
       hackDate: columns[HACK_DATE_COLUMN_INDEX].innerText.toUpperCase(),
+      tag: columns[TAG_COLUMN_INDEX].innerText.toUpperCase(),
       tableRow,
     }
   });
@@ -40,6 +43,9 @@ function main() {
 
   const hackDatesInput = document.getElementById("hackDatesInput");
   setHackDatesFilterHandler(hackDatesInput, tableRowContents);
+
+  const tagInput = document.getElementById("tagInput");
+  setTagFilterHandler(tagInput, tableRowContents);
 }
 
 /**
@@ -72,6 +78,17 @@ function setHackDatesFilterHandler(hackDatesInput, tableRowContents) {
   hackDatesInput.addEventListener("keyup", debounce((keyUpEvent) => {
     const searchString = keyUpEvent.target.value.toUpperCase();
     filterRows(searchString, "hackDate", tableRowContents);
+  }), DEBOUNCE_DELAY);
+}
+
+/**
+ * @param {HTMLSelectElement} tagInput
+ * @param {HackTableRowContent[]} tableRowContents
+ */
+ function setTagFilterHandler(tagInput, tableRowContents) {
+  tagInput.addEventListener("change", debounce((changeEvent) => {
+    const searchString = changeEvent.target.value.toUpperCase();
+    filterRows(searchString, "tag", tableRowContents);
   }), DEBOUNCE_DELAY);
 }
 
